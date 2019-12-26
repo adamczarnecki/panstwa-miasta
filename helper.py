@@ -1,4 +1,3 @@
-# _*_ coding: utf-8 _*_
 import random
 from data import *
 
@@ -19,6 +18,7 @@ def find_3(litera, lista):
 
 
 def raz_dwa_trzy(litera):
+    litera = str(litera)[0].upper()
     print('\n3 państwa na literę %s:' % (litera))
     find_3(litera, panstwa)
 
