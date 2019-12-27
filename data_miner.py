@@ -44,11 +44,11 @@ if __name__ == '__main__':
         file_name = str(sys.argv[1])
         url = str(sys.argv[2])
     except IndexError:
-        print('Podaj nazwę pliku docelowego oraz adres pierwszej strony')
+        print('Podaj nazwę pliku docelowego oraz adres pierwszej strony z kategorii na wikipedii')
 
     path = os.path.dirname(os.path.abspath(__file__)) + '/'
     start = time.time()
-    with open(path + file_name + '.txt', 'w', encoding='utf-8',) as f:
+    with open(path + file_name + '.txt', 'w', encoding='utf-8') as f:
         k = sorted(get_all_pages_names(url))
         bez_powtorzen = [k[i] for i in range(len(k)) if i == 0 or k[i] != k[i - 1]]
         f.write(str(bez_powtorzen))
