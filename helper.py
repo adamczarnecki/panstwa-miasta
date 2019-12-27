@@ -3,7 +3,6 @@ from data import *
 
 
 def find_3(litera, lista):
-    litera = str(litera)[0].upper()
     wybrane = []
     for element in lista:
         if litera == element[0]:
@@ -33,6 +32,9 @@ def raz_dwa_trzy(litera):
 
     print('\n3 imiona męskie na literę %s:' % (litera))
     find_3(litera, imiona_meskie)
+
+    print('\n3 góry na literę %s:' % (litera))
+    find_3(litera, gory)
 
 
 if __name__ == '__main__':
