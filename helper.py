@@ -17,6 +17,8 @@ def find_3(litera, lista):
 
 
 def raz_dwa_trzy(litera):
+    if litera == '':
+        return
     litera = str(litera)[0].upper()
     print('\n3 państwa na literę %s:' % (litera))
     find_3(litera, panstwa)
@@ -32,6 +34,12 @@ def raz_dwa_trzy(litera):
 
     print('\n3 imiona męskie na literę %s:' % (litera))
     find_3(litera, imiona_meskie)
+
+    print('\n3 zwierzęta na literę %s:' % (litera))
+    find_3(litera, zwierzeta)
+
+    print('\n3 rośliny na literę %s:' % (litera))
+    find_3(litera, rosliny)
 
     print('\n3 góry na literę %s:' % (litera))
     find_3(litera, gory)
