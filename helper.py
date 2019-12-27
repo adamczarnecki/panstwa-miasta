@@ -16,7 +16,7 @@ def find_3(litera, lista):
             print(x)
 
 
-def raz_dwa_trzy(litera):
+def xyz(litera):
     if litera == '':
         return
     litera = str(litera)[0].upper()
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     try:
         while True:
             litera = input('\nJaka litera? ')
-            raz_dwa_trzy(litera)
+            xyz(litera)
 
     except KeyboardInterrupt:
         print('\n\nKoniec psot\n')
