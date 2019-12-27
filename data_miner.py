@@ -2,6 +2,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import sys
 import os
+import time
 
 
 def get_all_pages_names(link):
@@ -24,13 +25,16 @@ def get_all_pages_names(link):
         page = urllib.request.urlopen('https://pl.wikipedia.org' + url)
         soup = BeautifulSoup(page, 'html.parser')
         h1 = soup.select('h1')[0].getText()
-        print('Czytam stronę "%s"' % (h1))
-        current_page = soup.select('#mw-content-text li', href=True)
-        for elem in current_page:
-            if elem.select('.CategoryTreeSection') == []:
-                lista_elementów_docelowych.append(elem.getText())
-            else:
-                listy_kategorii.append(elem.select('a', href=True)[0]['href'])
+        if 'ymarłe' in h1:
+            pass
+        else:
+            print('Czytam stronę "%s"' % (h1))
+            current_page = soup.select('#mw-content-text li', href=True)
+            for elem in current_page:
+                if elem.select('.CategoryTreeSection') == []:
+                    lista_elementów_docelowych.append(elem.getText())
+                else:
+                    listy_kategorii.append(elem.select('a', href=True)[0]['href'])
 
     return lista_elementów_docelowych
 
@@ -43,7 +47,10 @@ if __name__ == '__main__':
         print('Podaj nazwę pliku docelowego oraz adres pierwszej strony')
 
     path = os.path.dirname(os.path.abspath(__file__)) + '/'
+    start = time.time()
     with open(path + file_name + '.txt', 'w', encoding='utf-8',) as f:
         k = sorted(get_all_pages_names(url))
         bez_powtorzen = [k[i] for i in range(len(k)) if i == 0 or k[i] != k[i - 1]]
         f.write(str(bez_powtorzen))
+    end = time.time()
+    print('\nTOTAL TIME: {} min. {} sec.'.format(int((end - start) // 60), int((end - start) % 60)))
