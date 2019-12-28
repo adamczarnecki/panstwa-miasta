@@ -3,21 +3,22 @@ from bs4 import BeautifulSoup
 import sys
 import os
 import time
+from langdetect import detect
 
 
 def get_all_pages_names(link):
 
     listy_kategorii = []
-    lista_elementów_docelowych = []
+    lista_elementow_docelowych = []
     page = urllib.request.urlopen(link)
     soup = BeautifulSoup(page, 'html.parser')
     h1 = soup.select('h1')[0].getText()
-    print('Czytam stronę %s' % (h1))
+    print('Czytam stronę: %s' % (h1))
     current_page = soup.select('#mw-content-text li', href=True)
 
     for elem in current_page:
         if elem.select('.CategoryTreeSection') == []:
-            lista_elementów_docelowych.append(elem.getText())
+            lista_elementow_docelowych.append(elem.getText())
         else:
             listy_kategorii.append(elem.select('a', href=True)[0]['href'])
 
@@ -28,29 +29,63 @@ def get_all_pages_names(link):
         if 'ymarłe' in h1:
             pass
         else:
-            print('Czytam stronę "%s"' % (h1))
+            print('Czytam stronę: "%s"' % (h1))
             current_page = soup.select('#mw-content-text li', href=True)
             for elem in current_page:
                 if elem.select('.CategoryTreeSection') == []:
-                    lista_elementów_docelowych.append(elem.getText())
+                    lista_elementow_docelowych.append(elem.getText())
                 else:
                     listy_kategorii.append(elem.select('a', href=True)[0]['href'])
 
-    return lista_elementów_docelowych
+    return lista_elementow_docelowych
+
+
+def remove_not_pl(lista):
+    print('Przed czyszczeniem: %s' % (len(lista)))
+    polska_lista = []
+    count = 0
+    five_procent = len(lista) // 100
+    for x in lista:
+        if str(detect(x)) == 'pl':
+            polska_lista.append(x)
+        else:
+            pass
+        count += 1
+        if five_procent == 0:
+            pass
+        elif count % five_procent == 0:
+            print('Czyszczenie... {:>5.2f}%'.format((count / len(lista)) * 100))
+
+    return polska_lista
+
 
 
 if __name__ == '__main__':
     try:
         file_name = str(sys.argv[1])
         url = str(sys.argv[2])
+        if 'https://pl.wikipedia.org/wiki/Kategoria:' not in url:
+            print('Link musi prowadzić do strony kategorii na wikipedii!')
+            raise
+        remove_latin = int(sys.argv[3])
+        if remove_latin not in [0, 1]:
+            print('Podaj wartość 0 (znaczy nie usuwaj łaciny) lub 1 (znaczy usuń łacinę)')
+            raise
     except IndexError:
-        print('Podaj nazwę pliku docelowego oraz adres pierwszej strony z kategorii na wikipedii')
+        print('Podaj nazwę pliku docelowego, adres pierwszej strony z kategorii na wikipedii oraz czy usunąć nie polskie nazwy (0 lub 1)')
+        raise
+
+    start = time.time()
+    k = sorted(get_all_pages_names(url))
+    bez_powtorzen = [k[i] for i in range(len(k)) if i == 0 or k[i] != k[i - 1]]
+    if remove_latin == 0:
+        to_save = (str(bez_powtorzen))
+    elif remove_latin == 1:
+        to_save = (str(remove_not_pl(bez_powtorzen)))
+    print('Gotowych do zapisania %s nazw' % (len(to_save)))
 
     path = os.path.dirname(os.path.abspath(__file__)) + '/'
-    start = time.time()
     with open(path + file_name + '.txt', 'w', encoding='utf-8') as f:
-        k = sorted(get_all_pages_names(url))
-        bez_powtorzen = [k[i] for i in range(len(k)) if i == 0 or k[i] != k[i - 1]]
-        f.write(str(bez_powtorzen))
+        f.write(to_save)    
     end = time.time()
-    print('\nTOTAL TIME: {} min. {} sec.'.format(int((end - start) // 60), int((end - start) % 60)))
+    print('\nTOTAL TIME: {} min. {} sec.\n'.format(int((end - start) // 60), int((end - start) % 60)))
