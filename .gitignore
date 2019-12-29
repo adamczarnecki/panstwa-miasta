@@ -1,5 +1,4 @@
 # Specify filepatterns you want git to ignore.
 *.pyc
 __pycache__/
-*.txt
 .DS_Store
