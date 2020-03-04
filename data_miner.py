@@ -48,13 +48,12 @@ def get_all_pages_names(link):
     return lista_elementow_docelowych
 
 
-# Print iterations progress
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd="\r"):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
-    if iteration == total: 
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end=printEnd)
+    if iteration == total:
         print()
 
 
@@ -62,14 +61,14 @@ def remove_not_pl(lista):
     print('Przed czyszczeniem: %s' % (len(lista)))
     polska_lista = []
     count = 0
-    printProgressBar(count, len(lista), prefix = 'Czyszczenie:', length = 50)
+    printProgressBar(count, len(lista), prefix='Czyszczenie:', length=50)
     for x in lista:
         if str(detect(x)) == 'pl':
             polska_lista.append(x)
         else:
             pass
         count += 1
-        printProgressBar(count, len(lista), prefix = 'Czyszczenie:', length = 50)
+        printProgressBar(count, len(lista), prefix='Czyszczenie:', length=50)
 
     return polska_lista
 
@@ -100,6 +99,6 @@ if __name__ == '__main__':
 
     path = os.path.dirname(os.path.abspath(__file__)) + '/'
     with open(path + file_name + '.txt', 'w', encoding='utf-8') as f:
-        f.write(str(to_save))    
+        f.write(str(to_save))
     end = time.time()
     print('\nTOTAL TIME: {} min. {} sec.\n'.format(int((end - start) // 60), int((end - start) % 60)))
