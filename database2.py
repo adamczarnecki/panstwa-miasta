@@ -23,7 +23,7 @@ def sql_create_table(con, table_name, table_columns):
 
 def sql_clear_table(con, table):
     cursorObj = con.cursor()
-    cursorObj.execute("DELETE FROM ?", (table, ))
+    cursorObj.execute("DELETE FROM %s" % (table))
     con.commit()
 
 
@@ -46,14 +46,9 @@ def sql_create_and_insert(con, rodzaj, iterable):
 
     con.set_trace_callback(None)
     cursorObj.executemany('INSERT INTO `hasla` (`rodzaj`, `name`) VALUES(?, ?);', [(rodzaj_id, x) for x in iterable])
-    """.executemany iteruje po każdym obiekcie w iterable. Dlatego musi być dawać się iterować (srt, tuple list),
-        ale dlatego też każdy dający sie przeiterować będzie podany jako osobny argument.
-        Dlatego:
-        cursorObj.executemany('INSERT INTO `hasla` (`rodzaj`, `name`) VALUES(%s, ?)' % (rodzaj_id), iterable)
-        zwraca błąd:
-        sqlite3.ProgrammingError: Incorrect number of bindings supplied. The current statement uses 1, and there are 10 supplied.
-        ponieważ 'Afganistan' ma 10 liter...
-        Dlatego musimy podać listę haseł jako listę krotek z jedną wartością.
+    """execute() i executemany przyjmuje tylko dwa arguenty. kwerenda i (ewentualnie) iterowalny obiekt to podstawiania "?"
+        obiekt do podstawienia zostanie przeiterowany w poszukiwaniu pojedyńczych elementów.
+        String możę być iterowany po każdej literze, więc jeżeli chcesz podstawić tylko jeden obiekt, trzeba go umiescić w ktotkę albo listę
         Jak się parametryzuje całe zapytanie to to staje sie logiczne i przestaje w ogóle dziwić ;P
     """
 
