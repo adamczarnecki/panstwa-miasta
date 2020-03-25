@@ -4,6 +4,9 @@ import sqlite3
 def sql_connection():
     try:
         con = sqlite3.connect('baza-hasel2.db')
+        # to niżej printuje zapytania sql
+        # https://nelsonslog.wordpress.com/2016/03/18/python-sqlite3-query-logging/
+        con.set_trace_callback(print)
         return con
     except Error:
         print(Error)
@@ -14,35 +17,26 @@ def sql_connection():
 def sql_create_table(con, table_name, table_columns):
     cursorObj = con.cursor()
     query = 'CREATE TABLE IF NOT EXISTS %s(%s);' % (table_name, table_columns)
-    print(query)
     cursorObj.execute(query)
     con.commit()
 
 
 def sql_clear_table(con, table):
     cursorObj = con.cursor()
-    print("DELETE FROM %s" % table)
-    cursorObj.execute("DELETE FROM %s" % table)
-    con.commit()
-
-
-def sql_insert(con, table, values):
-    cursorObj = con.cursor()
-    query = '''INSERT INTO `%s` (`name`) VALUES('%s') ''' % (table, values)
-    print(query)
-    cursorObj.execute(query)
+    cursorObj.execute("DELETE FROM ?", (table, ))
     con.commit()
 
 
 def sql_create_rodzaj(con, rodzaj):
-    sql_insert(con, 'rodzaje', rodzaj)
-
     cursorObj = con.cursor()
-    query = '''SELECT `id` FROM `rodzaje` WHERE `name` = "%s" ''' % (rodzaj)
-    print(query)
-    rows = cursorObj.execute(query)
+    # insert rodzaj
+    con.set_trace_callback(print)
+    cursorObj.execute('''INSERT INTO `rodzaje` (`name`) VALUES(?);''', (rodzaj, ))
+    con.commit()
+
+    # Get id of inserted rodzaj
+    rows = cursorObj.execute('''SELECT `id` FROM `rodzaje` WHERE `name` = ?;''', (rodzaj, ))
     rodzaj_id = list(rows)[0][0]
-    print('ID: ', rodzaj_id)
     return rodzaj_id
 
 
@@ -50,8 +44,8 @@ def sql_create_and_insert(con, rodzaj, iterable):
     cursorObj = con.cursor()
     rodzaj_id = sql_create_rodzaj(con, rodzaj)
 
-    print('INSERT INTO `hasla` (`rodzaj`, `name`) VALUES(%s, ?)' % (rodzaj_id))
-    cursorObj.executemany('INSERT INTO `hasla` (`rodzaj`, `name`) VALUES(%s, ?)' % (rodzaj_id), [(x, ) for x in iterable])
+    con.set_trace_callback(None)
+    cursorObj.executemany('INSERT INTO `hasla` (`rodzaj`, `name`) VALUES(?, ?);', [(rodzaj_id, x) for x in iterable])
     """.executemany iteruje po każdym obiekcie w iterable. Dlatego musi być dawać się iterować (srt, tuple list),
         ale dlatego też każdy dający sie przeiterować będzie podany jako osobny argument.
         Dlatego:
@@ -60,6 +54,7 @@ def sql_create_and_insert(con, rodzaj, iterable):
         sqlite3.ProgrammingError: Incorrect number of bindings supplied. The current statement uses 1, and there are 10 supplied.
         ponieważ 'Afganistan' ma 10 liter...
         Dlatego musimy podać listę haseł jako listę krotek z jedną wartością.
+        Jak się parametryzuje całe zapytanie to to staje sie logiczne i przestaje w ogóle dziwić ;P
     """
 
 
